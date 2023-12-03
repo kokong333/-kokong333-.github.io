@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>랜덤 움직이는 도형</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <script src="https://threejs.org/build/three.js"></script>
+  <script>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const shapes = [];
+
+    // 생성할 도형 개수 (10에서 50까지의 랜덤한 개수)
+    const numberOfShapes = Math.floor(Math.random() * (20 - 10 + 1)) + 10;
+
+    for (let i = 0; i < numberOfShapes; i++) {
+      // 랜덤하게 도형 선택 (정육면체 또는 구)
+      const isCube = Math.random() > 0.5;
+
+      // 랜덤한 크기 설정 
+      const size = Math.random() * 0.1 + 0.7;
+      const geometry = isCube ? new THREE.BoxGeometry(size, size, size) : new THREE.SphereGeometry(size);
+
+      const material = new THREE.MeshBasicMaterial({ color: Math.random() * 0xffffff });
+      const shape = new THREE.Mesh(geometry, material);
+
+      // 랜덤한 위치 설정
+      shape.position.set(
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 10
+      );
+
+      // 랜덤한 이동 방향 설정
+      shape.direction = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5);
+      scene.add(shape);
+      shapes.push(shape);
+    }
+
+    camera.position.z = 5;
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // 각 도형을 각기 다른 방향으로 움직임
+      shapes.forEach(shape => {
+        shape.rotation.x += (Math.random() - 1.0) * 0.1;
+        shape.rotation.y += (Math.random() - 1.0) * 0.1;
+        shape.rotation.z += (Math.random() - 1.0) * 0.1;
+
+        shape.position.add(shape.direction.clone().multiplyScalar(0.2)); // 방향으로 이동
+      });
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      const newWidth = window.innerWidth;
+      const newHeight = window.innerHeight;
+
+      camera.aspect = newWidth / newHeight;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(newWidth, newHeight);
+    });
+  </script>
+</body>
+
+</html>
